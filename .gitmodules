@@ -1,0 +1,21 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/tdesai2705/unify-ref-todo-backend.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/tdesai2705/unify-ref-todo-frontend.git
+[submodule "database"]
+	path = database
+	url = https://github.com/tdesai2705/unify-ref-todo-database.git
+[submodule "tests-unit"]
+	path = tests-unit
+	url = https://github.com/tdesai2705/unify-ref-todo-tests-unit.git
+[submodule "tests-integration"]
+	path = tests-integration
+	url = https://github.com/tdesai2705/unify-ref-todo-tests-integration.git
+[submodule "infrastructure"]
+	path = infrastructure
+	url = https://github.com/tdesai2705/unify-ref-todo-infrastructure.git
+[submodule "workflows"]
+	path = workflows
+	url = https://github.com/tdesai2705/unify-ref-todo-workflows.git
