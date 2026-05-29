@@ -19,9 +19,14 @@ jobs:
   test-backend:
     steps:
       - name: Checkout code
-        uses: cloudbees-io/checkout@v1
+        uses: cloudbees-io/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: Initialize submodules
+        uses: docker://alpine/git:latest
+        run: |
+          git submodule update --init --recursive
 
       - name: Run backend unit tests
         uses: docker://python:3.11
@@ -45,9 +50,14 @@ jobs:
   test-frontend:
     steps:
       - name: Checkout code
-        uses: cloudbees-io/checkout@v1
+        uses: cloudbees-io/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: Initialize submodules
+        uses: docker://alpine/git:latest
+        run: |
+          git submodule update --init --recursive
 
       - name: Validate frontend
         uses: docker://python:3.11
@@ -72,7 +82,12 @@ jobs:
     needs: test-backend
     steps:
       - name: Checkout code
-        uses: cloudbees-io/checkout@v1
+        uses: cloudbees-io/checkout@v2
+
+      - name: Initialize submodules
+        uses: docker://alpine/git:latest
+        run: |
+          git submodule update --init --recursive
 
       - name: Configure Docker Hub credentials
         id: dockerconfig
@@ -106,7 +121,12 @@ jobs:
     needs: test-frontend
     steps:
       - name: Checkout code
-        uses: cloudbees-io/checkout@v1
+        uses: cloudbees-io/checkout@v2
+
+      - name: Initialize submodules
+        uses: docker://alpine/git:latest
+        run: |
+          git submodule update --init --recursive
 
       - name: Configure Docker Hub credentials
         id: dockerconfig
