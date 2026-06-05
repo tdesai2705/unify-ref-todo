@@ -1,0 +1,53 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+
+name: Todo App CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-images:
+    steps:
+      - name: Checkout code
+        uses: cloudbees-io/checkout@v1
+
+      - name: Checkout submodules
+        uses: docker://alpine/git:latest
+        shell: sh
+        run: |
+          git submodule update --init --recursive
+
+      - name: Build and push backend
+        uses: cloudbees-io/kaniko@v1
+        with:
+          destination: tejasdesai27/todo-backend:${{ cloudbees.scm.sha }},tejasdesai27/todo-backend:latest
+          context: backend
+          labels: |
+            commit=${{ cloudbees.scm.sha }}
+            branch=${{ cloudbees.scm.branch }}
+
+      - name: Build and push frontend
+        uses: cloudbees-io/kaniko@v1
+        with:
+          destination: tejasdesai27/todo-frontend:${{ cloudbees.scm.sha }},tejasdesai27/todo-frontend:latest
+          context: frontend
+          labels: |
+            commit=${{ cloudbees.scm.sha }}
+            branch=${{ cloudbees.scm.branch }}
+
+  deploy-via-jenkins:
+    needs: build-images
+    steps:
+      - name: Trigger Jenkins deployment
+        uses: cloudbees-io/jenkins-run-job@v1
+        with:
+          url: ${{ vars.JENKINS_URL }}
+          username: ${{ secrets.JENKINS_USERNAME }}
+          token: ${{ secrets.JENKINS_TOKEN }}
+          job-name: todo-app-pipeline
+          parameters: |
+            BACKEND_TAG=${{ cloudbees.scm.sha }}
+            FRONTEND_TAG=${{ cloudbees.scm.sha }}
