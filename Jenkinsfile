@@ -1,5 +1,19 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command:
+    - cat
+    tty: true
+"""
+        }
+    }
 
     environment {
         BACKEND_IMAGE = 'tejasdesai27/todo-backend'
@@ -9,13 +23,15 @@ pipeline {
     stages {
         stage('Deploy to Dev') {
             steps {
-                echo "Auto-deploying to Dev..."
-                sh """
-                    kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest -n dev-todo-app
-                    kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest -n dev-todo-app
-                    kubectl rollout status deployment/backend -n dev-todo-app
-                    kubectl rollout status deployment/frontend -n dev-todo-app
-                """
+                container('kubectl') {
+                    echo "Auto-deploying to Dev..."
+                    sh """
+                        kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest -n dev-todo-app
+                        kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest -n dev-todo-app
+                        kubectl rollout status deployment/backend -n dev-todo-app
+                        kubectl rollout status deployment/frontend -n dev-todo-app
+                    """
+                }
             }
         }
 
@@ -23,12 +39,14 @@ pipeline {
             when { branch 'main' }
             steps {
                 input message: 'Deploy to QA?', ok: 'Deploy'
-                sh """
-                    kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest -n qa-todo-app
-                    kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest -n qa-todo-app
-                    kubectl rollout status deployment/backend -n qa-todo-app
-                    kubectl rollout status deployment/frontend -n qa-todo-app
-                """
+                container('kubectl') {
+                    sh """
+                        kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest -n qa-todo-app
+                        kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest -n qa-todo-app
+                        kubectl rollout status deployment/backend -n qa-todo-app
+                        kubectl rollout status deployment/frontend -n qa-todo-app
+                    """
+                }
             }
         }
 
@@ -36,12 +54,14 @@ pipeline {
             when { branch 'main' }
             steps {
                 input message: 'Deploy to PRODUCTION?', ok: 'Deploy'
-                sh """
-                    kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest -n prod-todo-app
-                    kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest -n prod-todo-app
-                    kubectl rollout status deployment/backend -n prod-todo-app
-                    kubectl rollout status deployment/frontend -n prod-todo-app
-                """
+                container('kubectl') {
+                    sh """
+                        kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest -n prod-todo-app
+                        kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest -n prod-todo-app
+                        kubectl rollout status deployment/backend -n prod-todo-app
+                        kubectl rollout status deployment/frontend -n prod-todo-app
+                    """
+                }
             }
         }
     }
