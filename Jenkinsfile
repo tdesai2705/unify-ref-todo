@@ -5,12 +5,14 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  serviceAccountName: jenkins-agents
   containers:
   - name: kubectl
-    image: bitnami/kubectl:latest
+    image: alpine/k8s:1.28.3
     command:
-    - cat
-    tty: true
+    - sleep
+    args:
+    - 99d
 """
         }
     }
