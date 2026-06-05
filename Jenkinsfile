@@ -83,7 +83,7 @@ pipeline {
     
     post {
         success {
-            echo "✅ Deployed\!"
+            echo "✅ Deployed!"
             echo "Dev: http://todo-app.34.75.0.106.nip.io"
         }
     }
